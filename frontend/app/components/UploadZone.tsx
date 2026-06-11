@@ -10,26 +10,46 @@ interface Props {
 }
 
 export function UploadZone({ onFileChange, file }: Props) {
-  const inputRef   = useRef<HTMLInputElement>(null);
-  const cameraRef  = useRef<HTMLInputElement>(null);
+  const inputRef  = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragging(false);
     const dropped = e.dataTransfer.files[0];
-    if (dropped && dropped.type.startsWith("image/")) onFileChange(dropped);
+    if (dropped?.type.startsWith("image/")) onFileChange(dropped);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] ?? null;
     if (selected) onFileChange(selected);
+    // Reset para permitir seleccionar la misma imagen de nuevo
+    e.target.value = "";
   };
 
   const preview = file ? URL.createObjectURL(file) : null;
 
   return (
     <div className="space-y-2">
+      {/* Input galería */}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleChange}
+      />
+      {/* Input cámara nativa */}
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleChange}
+      />
+
       {/* Zona drag & drop */}
       <div
         onClick={() => !file && inputRef.current?.click()}
@@ -45,30 +65,9 @@ export function UploadZone({ onFileChange, file }: Props) {
           file && "cursor-default"
         )}
       >
-        {/* Input galería */}
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleChange}
-        />
-        {/* Input cámara — sin accept para que Android abra directo la cámara */}
-        <input
-          ref={cameraRef}
-          type="file"
-          capture="environment"
-          className="hidden"
-          onChange={handleChange}
-        />
-
         {preview ? (
           <>
-            <img
-              src={preview}
-              alt="preview"
-              className="h-full w-full object-contain max-h-[220px]"
-            />
+            <img src={preview} alt="preview" className="h-full w-full object-contain max-h-[220px]" />
             <button
               onClick={(e) => { e.stopPropagation(); onFileChange(null); }}
               className="absolute top-2 right-2 rounded-full bg-background/80 p-1 shadow hover:bg-destructive hover:text-white transition-colors"
@@ -82,9 +81,7 @@ export function UploadZone({ onFileChange, file }: Props) {
               <UploadCloud className="h-8 w-8 text-white" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-medium text-foreground">
-                Arrastra una imagen o haz clic
-              </p>
+              <p className="text-sm font-medium text-foreground">Arrastra una imagen o haz clic</p>
               <p className="text-xs mt-1">JPG, PNG · foto de la conjuntiva palpebral</p>
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
@@ -95,15 +92,14 @@ export function UploadZone({ onFileChange, file }: Props) {
         )}
       </div>
 
-      {/* Botón tomar foto — solo visible cuando no hay imagen */}
+      {/* Botón tomar foto */}
       {!file && (
         <button
-          onClick={() => cameraRef.current?.click()}
-          className={cn(
-            "w-full flex items-center justify-center gap-2 rounded-2xl border border-border",
-            "py-3 text-sm font-medium text-muted-foreground",
-            "hover:border-white/30 hover:text-foreground hover:bg-muted/50 transition-all"
-          )}
+          onClick={(e) => {
+            e.stopPropagation();
+            cameraRef.current?.click();
+          }}
+          className="w-full flex items-center justify-center gap-2 rounded-2xl border border-border py-3 text-sm font-medium text-muted-foreground hover:border-white/30 hover:text-foreground hover:bg-muted/50 transition-all"
         >
           <Camera className="h-4 w-4" />
           Tomar foto
