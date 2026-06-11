@@ -11,8 +11,7 @@ build/
 .venv
 venv/
 
-# Modelos (archivos grandes — subir por separado si se necesita)
-*.h5
+# Modelos — .h5 se sube via Git LFS, .keras se ignora
 *.keras
 
 # Dataset
