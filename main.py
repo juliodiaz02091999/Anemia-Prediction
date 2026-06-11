@@ -36,11 +36,6 @@ class PredictionResponse(BaseModel):
     anemia:      bool
 
 
-@app.on_event("startup")
-async def startup():
-    get_model()
-
-
 @app.get("/health")
 def health():
     try:
