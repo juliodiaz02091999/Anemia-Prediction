@@ -53,11 +53,10 @@ export function UploadZone({ onFileChange, file }: Props) {
           className="hidden"
           onChange={handleChange}
         />
-        {/* Input cámara — capture="environment" abre la cámara trasera en móvil */}
+        {/* Input cámara — sin accept para que Android abra directo la cámara */}
         <input
           ref={cameraRef}
           type="file"
-          accept="image/*"
           capture="environment"
           className="hidden"
           onChange={handleChange}
